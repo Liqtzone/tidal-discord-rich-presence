@@ -98,7 +98,7 @@ Log files rotate automatically, with up to three older files retained. Check the
 
 ## Security
 
-- `.env` contains local credentials and is ignored by Git. Do not commit it.
+- Don't share `.env` .
 - Share `.env.example`, which contains blank placeholders, instead.
 - If a client secret is exposed, rotate it in the corresponding developer portal.
 - The Discord Application ID is not a secret, but it is kept in `.env` so each user can configure their own app.
