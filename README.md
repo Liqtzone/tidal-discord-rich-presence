@@ -1,121 +1,121 @@
 # TIDAL Discord Rich Presence
 
-Windows'ta TIDAL masaüstü uygulamasında çalan parçayı algılar ve Discord profilinde Rich Presence olarak gösterir. Şarkı, sanatçı, albüm ve ilerleme çubuğunu Windows medya oturumundan alır; kapak görseli ve TIDAL bağlantıları için TIDAL kataloğunu arar. İsteğe bağlı olarak Windows bildirim alanında simge olarak çalışır ve Windows oturum açıldığında otomatik başlayabilir.
+A Windows app that detects the track playing in the TIDAL desktop app and shares it as Discord Rich Presence. Track, artist, album, and playback progress come from the Windows media session. The app looks up artwork and TIDAL links in the TIDAL catalog. It can run from the Windows notification area and optionally start when you sign in.
 
-## Özellikler
+## Features
 
-- TIDAL masaüstü oynatımını Windows medya denetimlerinden algılama
-- Discord'da şarkı adı, sanatçı, albüm ve zaman göstergesi
-- TIDAL kataloğundan parça, sanatçı ve albüm eşleştirmesi
-- Bildirim alanında simge ve menüden çıkış
-- CMD penceresi açmadan çalışma
-- İsteğe bağlı Windows oturum açılışında otomatik başlatma
-- İkinci örneğin yanlışlıkla açılmasını önleme
-- Yerel log dosyalarıyla hata ayıklama
+- Detects TIDAL playback through Windows media controls
+- Shows the track, artist, album, and playback progress on Discord
+- Looks up track, artist, album, and artwork details in the TIDAL catalog
+- Runs from a notification-area icon with an Exit menu item
+- Runs without a command prompt window
+- Optional startup when you sign in to Windows
+- Writes rotating local logs for troubleshooting
+- Prevents multiple instances from running at once
 
-## Gereksinimler
+## Requirements
 
-- Windows 10 veya Windows 11
-- Python 3.11 veya daha yeni
-- Discord masaüstü uygulaması
-- TIDAL masaüstü uygulaması ve etkin bir medya oturumu
-- Discord Developer Portal'dan bir uygulama kimliği
-- TIDAL Developer Portal'dan uygulama kimliği ve gizli anahtar
+- Windows 10 or Windows 11
+- Python 3.11 or later
+- Discord desktop app
+- TIDAL desktop app with an active media session
+- A Discord application ID from the Discord Developer Portal
+- TIDAL application credentials from the TIDAL Developer Portal
 
-## Kurulum
+## Installation
 
-PowerShell veya Komut İstemi'nde proje klasörüne geç:
+Open PowerShell or Command Prompt and go to the project folder:
 
 ```powershell
 cd "$env:USERPROFILE\Documents\tidal-rpc"
 ```
 
-Bağımlılıkları kur:
+Install the dependencies:
 
 ```powershell
 py -m pip install -r requirements.txt
 ```
 
-> `winsdk` yerine PyWinRT kullanılır. Böylece Python 3.15'te eski `winsdk` paketinin C++ derlemesi ve Visual Studio gereksinimi oluşmaz.
+> This project uses PyWinRT instead of the older `winsdk` package, avoiding the C++ build and Visual Studio requirement that can occur with Python 3.15.
 
-Örnek ayar dosyasını oluştur ve düzenle:
+Create and edit your local settings file:
 
 ```powershell
 Copy-Item .env.example .env
 notepad .env
 ```
 
-`.env` dosyasında bu değerleri gir:
+Fill in the values in `.env`:
 
 ```dotenv
-DISCORD_CLIENT_ID=Discord_Application_ID
-TIDAL_CLIENT_ID=TIDAL_Client_ID
-TIDAL_CLIENT_SECRET=TIDAL_Client_Secret
-TIDAL_COUNTRY_CODE=TR
+DISCORD_CLIENT_ID=your_discord_application_id
+TIDAL_CLIENT_ID=your_tidal_client_id
+TIDAL_CLIENT_SECRET=your_tidal_client_secret
+TIDAL_COUNTRY_CODE=US
 ```
 
-Discord uygulama kimliğini [Discord Developer Portal](https://discord.com/developers/applications) içindeki uygulamanın **General Information** sayfasında bulabilirsin. TIDAL kimlik bilgilerini [TIDAL Developer Portal](https://developer.tidal.com/) üzerinden oluşturduğun uygulamadan al. TIDAL kataloğuna erişim uygulaman için etkin değilse portal üzerinden katalog erişimini etkinleştirmen gerekebilir.
+Find the Discord Application ID on the app's **General Information** page in the [Discord Developer Portal](https://discord.com/developers/applications). Get the TIDAL credentials from your app in the [TIDAL Developer Portal](https://developer.tidal.com/). Your TIDAL app may need catalog access enabled in the developer portal.
 
-## Çalıştırma
+## Run
 
-Geliştirme sırasında logları terminalde görmek için:
+To run from a terminal while developing:
 
 ```powershell
 py tidal_rpc.py
 ```
 
-CMD penceresi olmadan çalıştırmak için:
+To run without a command prompt window:
 
 ```powershell
 pyw tidal_rpc.py
 ```
 
-Discord ve TIDAL açıkken bir parça çal. Bildirim alanındaki simge menüsünden **Çıkış** seçerek uygulamayı kapatabilirsin.
+Keep Discord and TIDAL open and play a track. Right-click the notification-area icon and select **Exit** to close the app.
 
-## Windows ile otomatik başlatma
+## Start automatically with Windows
 
-Bağımlılıkları kurup `.env` dosyasını doldurduktan sonra PowerShell'de proje klasöründen çalıştır:
+After installing dependencies and filling in `.env`, run this from PowerShell in the project folder:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install_autostart.ps1
 ```
 
-Uygulama, Windows hesabına giriş yapıldığında gizli konsol olmadan başlar. Başlangıç kısayolunu kaldırmak için:
+The app will start without a command prompt when you sign in to Windows. To remove the startup shortcut, run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\uninstall_autostart.ps1
 ```
 
-## Loglar
+## Logs
 
-Loglar Windows'ta şu konuma yazılır:
+Logs are saved to:
 
 ```text
 %LOCALAPPDATA%\TidalRPC\logs\tidal-rpc.log
 ```
 
-Loglar döndürülür ve üç eski dosyaya kadar saklanır. API erişimi veya Discord bağlantısı çalışmıyorsa bu dosyadaki son hata mesajlarına bak.
+Log files rotate automatically, with up to three older files retained. Check the latest log if catalog lookup or Discord connection fails.
 
-## Güvenlik
+## Security
 
-- `.env` kişisel kimlik bilgilerini içerir ve Git tarafından yok sayılır. Bu dosyayı GitHub'a ekleme.
-- Yalnızca `.env.example` dosyasını paylaş.
-- Bir Client Secret yanlışlıkla paylaşıldıysa ilgili geliştirici panelinden yenile.
-- Discord Application ID gizli anahtar değildir; yine de `.env` ile yerel ayarda tutularak her kullanıcının kendi uygulamasını tanımlaması sağlanır.
+- `.env` contains local credentials and is ignored by Git. Do not commit it.
+- Share `.env.example`, which contains blank placeholders, instead.
+- If a client secret is exposed, rotate it in the corresponding developer portal.
+- The Discord Application ID is not a secret, but it is kept in `.env` so each user can configure their own app.
 
-## Bilinen sınırlar
+## Known limitations
 
-- Uygulama Windows ve TIDAL masaüstü medya oturumu için hazırlanmıştır.
-- TIDAL araması için TIDAL Developer API erişimi ve uygulama kimlik bilgileri gerekir.
-- Kapak URL'si Discord Rich Presence'a gönderilir. Harici görsel URL'lerinin gösterimi Discord istemcisi ve RPC davranışına bağlı olabilir; Discord Developer Portal'da yüklenmiş sabit görseller farklı bir kullanım yoludur.
-- TIDAL kataloğunda eşleşme bulunamazsa şarkı ve sanatçı bilgisi Windows medya oturumundan gösterilmeye devam eder, ancak kapak ve TIDAL düğmeleri eklenmez.
+- This app is designed for Windows and the TIDAL desktop media session.
+- Catalog lookup requires TIDAL Developer API credentials and catalog access.
+- The app sends the TIDAL artwork URL to Discord Rich Presence. Displaying external image URLs may depend on Discord client and RPC behavior; uploaded Discord application assets use a different approach.
+- If a track cannot be matched in the TIDAL catalog, the app still shows the title and artist from Windows media controls, but omits artwork and TIDAL buttons.
 
-## GitHub için önerilen depo açıklaması
+## Suggested GitHub repository description
 
-> Windows'ta TIDAL'da çalan parçayı algılayıp Discord Rich Presence'ta şarkı bilgisi, ilerleme çubuğu ve TIDAL katalog verilerini gösteren Python uygulaması.
+> A Windows system tray app that detects the current TIDAL track and shares it as Discord Rich Presence with playback progress, links, and catalog artwork lookup.
 
-Önerilen konular: `tidal`, `discord-rich-presence`, `python`, `windows`, `music`.
+Suggested topics: `tidal`, `discord-rich-presence`, `python`, `windows`, `music`.
 
-## Atıf
+## Attribution
 
-Bu, TIDAL veya Discord tarafından yayımlanmamış bağımsız bir projedir. TIDAL içeriğini kullanırken [TIDAL Developer Guidelines](https://developer.tidal.com/documentation/guidelines-developer-guidelines-2_0) ve API koşullarına uy.
+This is an independent project and is not published by or affiliated with TIDAL or Discord. Follow the [TIDAL Developer Guidelines](https://developer.tidal.com/documentation/guidelines-developer-guidelines-2_0) and applicable API terms when using TIDAL content.
