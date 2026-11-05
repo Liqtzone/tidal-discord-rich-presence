@@ -1,0 +1,6 @@
+pypresence>=4.6.2
+requests>=2.32.5
+python-dotenv>=1.1.1
+winrt-Windows.Media.Control
+pystray>=0.19.5
+Pillow>=11.3.0
