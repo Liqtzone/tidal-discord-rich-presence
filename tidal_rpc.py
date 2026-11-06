@@ -220,12 +220,8 @@ def lookup(title: str, artist: str, album: str) -> dict | None:
 
         if best:
             track, album_resource, track_artists = best
-            track_id = str(track.get("id", ""))
             album_id = str(album_resource.get("id", "")) if album_resource else ""
             album_name = str(album_resource.get("attributes", {}).get("title", "")) if album_resource else album
-            artist_ids = _relation_ids(track, "artists")
-            artist_id = artist_ids[0] if artist_ids else ""
-
             cover_url = None
             if album_resource:
                 cover_ids = _relation_ids(album_resource, "coverArt")
@@ -236,12 +232,10 @@ def lookup(title: str, artist: str, album: str) -> dict | None:
                 cover_url = _artwork_url(artwork)
 
             info = {
-                "track_url": f"https://tidal.com/browse/track/{track_id}",
                 "album_url": f"https://tidal.com/browse/album/{album_id}" if album_id else f"https://tidal.com/",
-                "artist_url": f"https://tidal.com/browse/artist/{artist_id}" if artist_id else f"https://tidal.com/",
                 "cover": cover_url,
                 "album": album_name or album,
-                "artist": track_artists[0] if track_artists else artist,
+                "artists": [name.strip() for name in track_artists if name.strip()] or [artist],
             }
             cache[key] = info
             return info
@@ -282,16 +276,16 @@ def build_activity(state: dict, info: dict | None) -> dict:
     now = time.time()
     duration = state["dur"]
     start = int(now - state["pos"])
-    artist_name = str(state.get("artist") or "").strip()
-    if not artist_name and info and info.get("artist"):
-        artist_name = str(info["artist"]).strip()
-    artist_name = artist_name or "TIDAL"
+    artists = info.get("artists", []) if info else []
+    if not artists and state.get("artist"):
+        artists = [str(state["artist"]).strip()]
+    artist_name = ", ".join(name for name in artists if name) or "TIDAL"
     album_name = (info["album"] if info else state["album"]) or ""
     activity = {
         "activity_type": ActivityType.LISTENING,
         "name": artist_name[:128],
         "details": state["title"][:128],
-        "state": album_name[:128] or "Unknown",
+        "state": artist_name[:128],
         "large_text": album_name or state["title"],
         "start": start,
     }
@@ -302,10 +296,6 @@ def build_activity(state: dict, info: dict | None) -> dict:
         if info.get("cover"):
             activity["large_image"] = info["cover"]
             activity["_urls"] = {"large_url": info["album_url"]}
-        activity["buttons"] = [
-            {"label": "TIDAL'da Dinle", "url": info["track_url"]},
-            {"label": "Sanatçı", "url": info["artist_url"]},
-        ]
     return activity
 
 

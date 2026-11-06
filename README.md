@@ -5,7 +5,7 @@ A Windows app that detects the track playing in the TIDAL desktop app and shares
 ## Features
 
 - Detects TIDAL playback through Windows media controls
-- Shows the artist as the activity name, plus the track, album, and playback progress
+- Shows the track and all credited artists, including featured artists, with playback progress
 - Looks up track, artist, album, and artwork details in the TIDAL catalog
 - Runs from a notification-area icon with an Exit menu item
 - Runs without a command prompt window
@@ -107,7 +107,7 @@ Log files rotate automatically, with up to three older files retained. Check the
 - This app is designed for Windows and the TIDAL desktop media session.
 - Catalog lookup requires TIDAL Developer API credentials and catalog access.
 - The app sends the TIDAL artwork URL to Discord Rich Presence. Displaying external image URLs may depend on Discord client and RPC behavior; uploaded Discord application assets use a different approach.
-- If a track cannot be matched in the TIDAL catalog, the app still shows the title and artist from Windows media controls, but omits artwork and TIDAL buttons.
+- If a track cannot be matched in the TIDAL catalog, the app still shows the title and artist from Windows media controls, but omits artwork.
 
 ## Suggested GitHub repository description
 
