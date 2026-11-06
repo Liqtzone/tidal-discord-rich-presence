@@ -5,7 +5,7 @@ A Windows app that detects the track playing in the TIDAL desktop app and shares
 ## Features
 
 - Detects TIDAL playback through Windows media controls
-- Shows the track, artist, album, and playback progress on Discord
+- Shows the artist as the activity name, plus the track, album, and playback progress
 - Looks up track, artist, album, and artwork details in the TIDAL catalog
 - Runs from a notification-area icon with an Exit menu item
 - Runs without a command prompt window

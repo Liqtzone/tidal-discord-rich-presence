@@ -282,11 +282,17 @@ def build_activity(state: dict, info: dict | None) -> dict:
     now = time.time()
     duration = state["dur"]
     start = int(now - state["pos"])
+    artist_name = str(state.get("artist") or "").strip()
+    if not artist_name and info and info.get("artist"):
+        artist_name = str(info["artist"]).strip()
+    artist_name = artist_name or "TIDAL"
+    album_name = (info["album"] if info else state["album"]) or ""
     activity = {
         "activity_type": ActivityType.LISTENING,
+        "name": artist_name[:128],
         "details": state["title"][:128],
-        "state": state["artist"][:128] or "Unknown",
-        "large_text": (info["album"] if info else state["album"]) or state["title"],
+        "state": album_name[:128] or "Unknown",
+        "large_text": album_name or state["title"],
         "start": start,
     }
     if duration:
