@@ -221,7 +221,6 @@ def lookup(title: str, artist: str, album: str) -> dict | None:
         if best:
             track, album_resource, track_artists = best
             album_id = str(album_resource.get("id", "")) if album_resource else ""
-            album_name = str(album_resource.get("attributes", {}).get("title", "")) if album_resource else album
             cover_url = None
             if album_resource:
                 cover_ids = _relation_ids(album_resource, "coverArt")
@@ -234,7 +233,6 @@ def lookup(title: str, artist: str, album: str) -> dict | None:
             info = {
                 "album_url": f"https://tidal.com/browse/album/{album_id}" if album_id else f"https://tidal.com/",
                 "cover": cover_url,
-                "album": album_name or album,
                 "artists": [name.strip() for name in track_artists if name.strip()] or [artist],
             }
             cache[key] = info
@@ -280,13 +278,11 @@ def build_activity(state: dict, info: dict | None) -> dict:
     if not artists and state.get("artist"):
         artists = [str(state["artist"]).strip()]
     artist_name = ", ".join(name for name in artists if name) or "TIDAL"
-    album_name = (info["album"] if info else state["album"]) or ""
     activity = {
         "activity_type": ActivityType.LISTENING,
         "name": artist_name[:128],
         "details": state["title"][:128],
         "state": artist_name[:128],
-        "large_text": album_name or state["title"],
         "start": start,
     }
     if duration:
